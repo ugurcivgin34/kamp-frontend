@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/models/product';
-import { HttpClient } from '@angular/common/http'; //api ye ulaşabileceğiz
+
 import { ProductResponseModel } from 'src/app/models/productsResponseModel';
+import { ProductService } from 'src/app/services/product.service';
 
 //axios,fetch react tarafında
 
@@ -12,15 +13,9 @@ import { ProductResponseModel } from 'src/app/models/productsResponseModel';
 })
 export class ProductComponent implements OnInit {
   products: Product[] = [];
-  apiUrl = 'https://localhost:44318/api/products/getall';
-  productResponseModel:ProductResponseModel = {
-    data : this.products,
-    message:"",
-    success:true
-  }
+  dataLoaded = false;
 
-  constructor(private httpClient: HttpClient) {} // ProductComponenti bellekte oluşturmaktadır.instance ni üretmektir.yani new lemektir
-  //C# dependency injeksion servisleri yaptığımız yer burası
+  constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
     //console.log('Init çalıştı');
@@ -28,12 +23,11 @@ export class ProductComponent implements OnInit {
   }
 
   getProducts() {
-    this.httpClient
-      .get<ProductResponseModel>(this.apiUrl)
-      .subscribe((response) => {
-        this.products=response.data
-
-      });
-      
+    this.productService.getProducts().subscribe(response=>{
+      this.products = response.data;
+      this.dataLoaded = true;
+    })
+    
   }
 }
+
