@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Product } from 'src/app/models/product';
-
-import { ProductResponseModel } from 'src/app/models/productsResponseModel';
 import { ProductService } from 'src/app/services/product.service';
 
-//axios,fetch react tarafında
 
 @Component({
   selector: 'app-product',
@@ -15,19 +13,34 @@ export class ProductComponent implements OnInit {
   products: Product[] = [];
   dataLoaded = false;
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    //console.log('Init çalıştı');
-    this.getProducts();
+    this.activatedRoute.params.subscribe((params) => {
+      if (params['categoryId']) {
+        this.getProductsByCategory(params['categoryId']);
+      } else {
+        this.getProducts();
+      }
+    });
   }
 
   getProducts() {
-    this.productService.getProducts().subscribe(response=>{
+    this.productService.getProducts().subscribe((response) => {
       this.products = response.data;
       this.dataLoaded = true;
-    })
-    
+    });
+  }
+
+  getProductsByCategory(categoryId: number) {
+    this.productService
+      .getProductsByCategory(categoryId)
+      .subscribe((response) => {
+        this.products = response.data;
+        this.dataLoaded = true;
+      });
   }
 }
-
